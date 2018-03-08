@@ -11,6 +11,6 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'UrlController@index');
+Route::get('/{terse}', 'UrlController@verbose');
+Route::post('/terse', 'UrlController@terse');
