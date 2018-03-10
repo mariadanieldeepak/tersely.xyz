@@ -13,4 +13,8 @@
 
 Route::get('/', 'UrlController@index');
 Route::get('/{terse}', 'UrlController@verbose');
+
+Route::get('/p/about', function() {
+	return view('pages.about');
+});
 Route::post('/terse', 'UrlController@terse');

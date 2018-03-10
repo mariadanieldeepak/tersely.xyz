@@ -5,10 +5,21 @@
 @section('body')
     <div class="row">
         <div class="col">
+            @if(session('message'))
+                <div class="form-group">
+                    <div class="alert alert-success" role="alert">
+                        <a href="{{ $shortUrl }}">{{ $shortUrl }}</a>
+                    </div>
+                </div>
+            @endif
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
             @if($errors->any())
                 <div class="form-group">
                     <div class="alert alert-danger" role="alert">
-                        <ul>
+                        <ul class="mb-0">
                             @foreach($errors->all() as $error)
                                 <li>{{ $error }}</li>
                             @endforeach
@@ -18,20 +29,15 @@
             @endif
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-4 col-md-offset-4">
-            <form method="post" action="/terse">
-                <fieldset>
-                    <div class="form-group">
-                        <label for="url">Enter URL to shorten</label>
-                        <input type="text" class="form-control" id="url" aria-describedby="urlHelp" name="url" placeholder="URL to shorten">
-                    </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
-                </fieldset>
-                {{ csrf_field() }}
-            </form>
+    <div class="row no-gutters">
+        <form class="w-100" method="POST" action="/terse">
+        <div class="form-group col-8">
+            <input type="text" class="form-control" id="url" aria-describedby="urlHelp" name="url" placeholder="URL to shorten">
         </div>
+        <div class="form-group col-4">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            {{ csrf_field() }}
+        </div>
+        </form>
     </div>
 @endsection

@@ -4,13 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Url;
 use Illuminate\Http\Request;
-use Bijective\BijectiveTranslator;
+use App\Repositories\UrlRepository;
+use Illuminate\Http\Response;
 
 class UrlController extends Controller
 {
-    public function index()
+    protected $urlRepository;
+
+    public function __construct(UrlRepository $urlRepository) {
+        $this->urlRepository = $urlRepository;
+    }
+
+    public function index(Request $request)
     {
-        return view('dashboard.index');
+        return view('dashboard.index', [
+        	'shortUrl' => $request->root() . '/' . session('message')
+        ]);
     }
 
     public function terse(Request $request)
@@ -19,29 +28,20 @@ class UrlController extends Controller
             'url' => 'required|url',
         ]);
 
-        $url = Url::create([
-            'url' => request('url'),
-        ]);
-
-        $lastInsertedId = $url->id;
-
-        $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        $bijective = new BijectiveTranslator($alphabet);
-        $encoded = $bijective->encode($lastInsertedId);
-
-        $url = Url::find($lastInsertedId);
-        $url->terser = $encoded;
-        $url->save();
+        $shortUrl = $this->urlRepository->getShortUrl(request('url'));
+        session()->flash('message', $shortUrl);
 
         return redirect('/');
     }
 
     public function verbose(Request $request, $terse)
     {
-        $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        $bijective = new BijectiveTranslator($alphabet);
-        $decoded = $bijective->decode($terse);
-        $url = Url::find($decoded);
-        return redirect($url->url);
+        $url = $this->urlRepository->getLongUrlByShortUrl($terse);
+        if($url) {
+            return redirect()->away($url);
+        }
+        else {
+        	return new Response("Tersely couldn't find the URL you clicked");
+        }
     }
 }
